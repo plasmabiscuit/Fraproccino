@@ -1,0 +1,134 @@
+[
+    {
+        "description": "Proposal",
+        "column": 3,
+        "query": "Optional - Text 1",
+        "banner-elementId": null
+    },
+    {
+        "description": "Pi Last",
+        "column": 6,
+        "query": "Optional - Text 20",
+        "banner-elementId": null
+    },
+    {
+        "description": "Pi First",
+        "column": 7,
+        "query": "Optional - Text 20",
+        "banner-elementId": null
+    },
+    {
+        "description": "CoPi First",
+        "column": 8,
+        "query": "Optional - Text 26",
+        "banner-elementId": null
+    },
+    {
+        "description": "CoPI last",
+        "column": 9,
+        "query": "Optional - Text 26",
+        "banner-elementId": null
+    },
+    {
+        "description": "CoPi Dept",
+        "column": 10,
+        "query": "Optional - Text 30",
+        "banner-elementId": null
+    },
+    {
+        "description": "College",
+        "column": 20,
+        "query": "Optional - Text 23",
+        "banner-elementId": null
+    },
+    {
+        "description": "Dept",
+        "column": 21,
+        "query": "Optional - Text 24",
+        "banner-elementId": "inp:frbprop_frbpropOrgnCodeRespOffice"
+    },
+    {
+        "description": "Project Type",
+        "column": 22,
+        "query": "Optional - Project Type",
+        "banner-elementId": "inp:frbprop_frbpropProposalType"
+    },
+    {
+        "description": "Category",
+        "column": 23,
+        "query": "Optional - Category",
+        "banner-elementId": "inp:frbprop_frbpropCategory"
+    },
+    {
+        "description": "CFDA",
+        "column": 25,
+        "query": "Optional - Text 17",
+        "banner-elementId": "inp:frbprop_frbpropCfdaCode"
+    },
+    {
+        "description": "Total Start",
+        "column": 26,
+        "query": "Optional - Text 10",
+        "banner-elementId": "page_headerInformation_frbpropProjectStartDate"
+    },
+    {
+        "description": "Total End",
+        "column": 27,
+        "query": "Optional - Text 11",
+        "banner-elementId": "page_headerInformation_frbpropProjectEndDate"
+    },
+    {
+        "description": "Total Awarded",
+        "column": 28,
+        "query": "Optional - Text 164",
+        "banner-elementId": null
+    },
+    {
+        "description": "Total Direct",
+        "column": 29,
+        "query": "Optional - Text  146",
+        "banner-elementId": null
+    },
+    {
+        "description": "Total Indirect",
+        "column": 30,
+        "query": "Optional - Text  159",
+        "banner-elementId": null
+    },
+    {
+        "description": "Activation Start",
+        "column": 31,
+        "query": "Optional - Text 18",
+        "banner-elementId": "page_headerInformation_frbpropBudgPrdStartDat"
+    },
+    {
+        "description": "Activation End",
+        "column": 32,
+        "query": "Optional - Text 19",
+        "banner-elementId": "page_headerInformation_frbpropBudgPrdEndDate"
+    },
+    {
+        "description": "PI Tnumber",
+        "column": 39,
+        "query": "Optional Text - 21",
+        "banner-elementId": "inp:frbprop_frbpropPiIdCode"
+    },
+    {
+        "description": "Prime Sponsor",
+        "column": 41,
+        "query": "Optional - Text 12",
+        "banner-elementId": "inp:frbprop_frbpropAgencyCode"
+    },
+    {
+        "description": "Title",
+        "column": 42,
+        "query": "Optional - Text 9",
+        "banner-elementId": "inp:frbprop_frbpropLongTitle"
+    },
+    {
+        "description": "Index",
+        "column": 43,
+        "query": "Optional - Text 3",
+        "banner-elementId": null
+    }
+]
