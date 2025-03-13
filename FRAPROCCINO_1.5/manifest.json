@@ -73,10 +73,18 @@
         "images/superccino.gif",
         "images/Accounts.png",
         "images/Agencies.png",
+        "images/pdf.png",
+        "images/word.png",
+        "images/excel.png",
+        "images/ppt.png",
         "images/border.png",
         "fonts/VT323-Regular.ttf",
         "sidebar.html",
-        "siderbar.css"
+        "siderbar.css",
+        "libs/*",
+        "fonts/*",
+        "images/*",
+        "data/*"
       ],
       "matches": ["<all_urls>"]
     }
