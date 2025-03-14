@@ -33,7 +33,7 @@
 
     /* Input group styling */
     .input-group { margin-bottom: 8px; }
-    .input-group input, .input-group select { padding: 5px; box-sizing: border-box; width: 100%; background-color: #3a3a3a; color: #fff; }
+    .input-group input, .input-group select { padding: 5px; box-sizing: border-box; width: 97%; background-color: #3a3a3a; color: #fff; border-radius: 5px; }
     .flex-row { display: flex; gap: 5px; }
     .flex-row > * { flex: 1; }
     /* Top row: Proposal number and dates */
@@ -49,9 +49,12 @@
       padding-top: 2px; padding-bottom: 2px;
       background: #3a3a3a;
       margin-top: 0;
+      margin-bottom: 4px;
       position: relative;
       
     }
+   
+  
     .block-header, .block-footer, .sponsor-badges { margin-top: -2px; margin-bottom: -2px; text-align: center; padding: 5px; display: flex; flex-direction: row; justify-content: space-evenly;}
     .block-content { font-size: 22px; text-align: center; word-wrap: break-word; }
     .badge { background: #9b7559; border-radius: 3px; padding: 2px 4px; font-size: 9pt; color: #fff; margin: 3px 0px; }
@@ -163,6 +166,13 @@ button:hover {background-color:#494949
   line-break: anywhere;
   font-size: 15px;
 }
+
+#excelSheetSelect {
+  background-color: #2c2c2c; 
+  color: #949494;
+  border: none;
+  font-family: 'VT323'
+}
   </style>
 </head>
 <body>
@@ -239,11 +249,19 @@ button:hover {background-color:#494949
               <img src="/images/alt-Coffee.gif" alt="Logo" style="width: 200px; height: 100px; margin-top: -37px; margin-left: 78px;">
             </div>
             <div class="drawer">
-              <button id="emailBtn-0" title="Email">📧</button>
-              <button id="attachmentsBtn-0" title="Attachments">📎</button> 
-              <button id="consoleBtn-0" title="Console">🖥️</button>
+              <button id="emailBtn-0" title="Email">
+                <img src="../images/mail.png" alt="Email" style="width: 30px; height: auto;">
+              </button>
+              <button id="attachmentsBtn-0" title="Attachments">
+                <img src="../images/attachments.png" alt="Attachments" style="width: 30px; height: auto;">
+              </button>
+              <button id="consoleBtn-0" title="Console">
+                <img src="../images/log.png" alt="Console" style="width: 30px; height: auto;">
+              </button>
             </div>
-            <div class="button-container">
+            
+            <div class="button-container" style="display: flex; justify-content: space-between;">
+              <button id="archiveBtn" style="color: #949494; font-family: vt323; border-radius: 30%;">Archive</button>
               <button id="budgetBtn" style="color: #949494; font-family: vt323; border-radius: 30%;">Budget</button>
             </div>
           </div>

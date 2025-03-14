@@ -275,6 +275,18 @@ document.getElementById("totalCost-0").addEventListener("blur", () => checkAndUp
     () => checkAndUpdateProposalBlock(0)
   );
 });
+  
+// Add missing function to remove the proposal block and restore the input view
+function removeProposalBlock(cardIndex) {
+  const container = document.getElementById(`proposalBlockContainer-${cardIndex}`);
+  if(container) {
+    container.innerHTML = "";
+  }
+  const inputs = document.getElementById(`proposalInputs-${cardIndex}`);
+  if(inputs) {
+    inputs.style.display = "block";
+  }
+}
 
 
 /* ============================================================
@@ -818,7 +830,8 @@ function renderDrawerDisplay() {
   } else if (drawerState === "email") {
     display.innerHTML = `<p>No recent conversations</p>`;
   } else if (drawerState === "console") {
-    display.innerHTML = `<p>No logs to display</p>`;
+    // Render archived proposals with updated console blocks
+    renderConsoleBlocks();
   }
 }
 
@@ -891,7 +904,7 @@ function createPreviewOverlay() {
     overlay.style.zIndex = '9999';
     overlay.style.display = 'none';
     overlay.innerHTML = `
-  <div id="filePreviewContainer" style="position: relative; margin: 0; padding: 20px; background: #fff; color: black; width: 98vw; height: 100vh; overflow: auto;">
+  <div id="filePreviewContainer" style="position: relative; margin: 0; padding: 20px; background-color: #2c2c2c; color: #949494; width: 98vw; height: 100vh; overflow: auto;">
     <div id="filePreviewHeader" style="display: flex; justify-content: space-between; align-items: center; margin: 0px 5px">
       <span id="filePreviewTitle" style="font-weight: bold;"></span>
       <button id="filePreviewClose" style="font-size: 16px; cursor: pointer;">Close</button>
@@ -1047,9 +1060,7 @@ function renderExcel(file) {
     }
 
     // Define a style block that adds a light grey bottom border to each row
-    const styleBlock = `<style>
-      table tr { border-bottom: 1px solid #ddd; }
-    </style>`;
+    const styleBlock = `<style>table tr { border-bottom: 1px solid #ddd; background-color: #2c2c2c; color: #949494; }</style>`;
 
     // Function to render a specific sheet by index
     function renderSheet(sheetIndex) {
@@ -1237,4 +1248,307 @@ document.addEventListener("DOMContentLoaded", function() {
   if (budgetBtn) {
     budgetBtn.addEventListener("click", showBudgetPage);
   }
+
+  const personnelPlusBtn = document.querySelector("#personnelContainer-0 .add-plus");
+  if (personnelPlusBtn) {
+    personnelPlusBtn.addEventListener("click", function() {
+      addEmptyPersonnelRow(0);
+    });
+  }
 });
+
+/* ============================================================
+   ARCHIVE & CONSOLE FUNCTIONS
+   ============================================================ */
+
+// Archives the current sidepanel state
+function archiveCurrentProposal() {
+    // Gather current form data and display blocks from localStorage
+    const formData = localStorage.getItem("sidebarFormData");
+    const displayBlocks = localStorage.getItem("sidebarDisplayBlocks");
+    // Archive current attachments (assumed to be managed in a global variable)
+    const archiveEntry = {
+        timestamp: Date.now(),
+        formData: formData ? JSON.parse(formData) : {},
+        displayBlocks: displayBlocks ? JSON.parse(displayBlocks) : {},
+        attachments: attachments   // attachments stored as an array
+    };
+
+    // Retrieve existing archives
+    let archivedProposals = JSON.parse(localStorage.getItem("archivedProposals") || "[]");
+    archivedProposals.push(archiveEntry);
+    // For entries older than the 20 most recent, remove attachments to conserve space
+    if (archivedProposals.length > 20) {
+        for (let i = 0; i < archivedProposals.length - 20; i++) {
+            archivedProposals[i].attachments = null;
+        }
+    }
+    localStorage.setItem("archivedProposals", JSON.stringify(archivedProposals));
+
+    // Clear the current sidepanel state
+    clearSidePanel();
+    // Reload to reflect the cleared state
+    location.reload();
+}
+
+// Clears the sidepanel state (form data, display blocks, and attachments)
+function clearSidePanel() {
+    localStorage.removeItem("sidebarFormData");
+    localStorage.removeItem("sidebarDisplayBlocks");
+    attachments = [];
+    localStorage.setItem('attachments', JSON.stringify(attachments));
+    // Optionally, clear any visible fields if needed.
+}
+
+// Loads an archived proposal into the sidepanel by its index in the archivedProposals array
+function loadArchivedProposal(archiveIndex) {
+    let archivedProposals = JSON.parse(localStorage.getItem("archivedProposals") || "[]");
+    if (!archivedProposals[archiveIndex]) return;
+    const entry = archivedProposals[archiveIndex];
+    // Restore state into localStorage
+    localStorage.setItem("sidebarFormData", JSON.stringify(entry.formData));
+    localStorage.setItem("sidebarDisplayBlocks", JSON.stringify(entry.displayBlocks));
+    if (entry.attachments) {
+      attachments = entry.attachments;
+      localStorage.setItem("attachments", JSON.stringify(attachments));
+    } else {
+      attachments = [];
+      localStorage.setItem("attachments", JSON.stringify(attachments));
+    }
+    // Reload to repopulate the UI with restored data
+    location.reload();
+}
+
+// UPDATED: Render archived proposals in the console drawer-display area
+function renderConsoleBlocks() {
+  const display = document.querySelector('.drawer-display');
+  if (!display) return;
+  let archivedProposals = JSON.parse(localStorage.getItem("archivedProposals") || "[]");
+
+  if (archivedProposals.length === 0) {
+    display.innerHTML = `<p>No archived proposals</p>`;
+    return;
+  }
+  
+  display.innerHTML = ""; // Clear current contents
+  
+  // Create search container at the top
+  const searchContainer = document.createElement("div");
+  searchContainer.style.display = "flex";
+  searchContainer.style.alignItems = "center";
+  searchContainer.style.justifyContent = "center";
+  searchContainer.style.marginBottom = "10px";
+  searchContainer.style.padding = "5px";
+  
+  // Create search button with magnifying glass
+  const searchBtn = document.createElement("button");
+  searchBtn.className = "add-plus";
+  searchBtn.innerHTML = '<img src="' + chrome.runtime.getURL('/images/search.svg') + '" alt="Search" style="width:28px;height:28px;">';
+  searchBtn.style.marginRight = "5px";
+  
+  // Create hidden search input
+  const searchInput = document.createElement("input");
+  searchInput.type = "text";
+  searchInput.placeholder = "Search proposals...";
+  searchInput.style.display = "none";
+  searchInput.style.flex = "1";
+  searchInput.style.padding = "5px";
+  searchInput.style.backgroundColor = "#3a3a3a";
+  searchInput.style.color = "#fff";
+  searchInput.style.border = "none";
+  searchInput.style.borderRadius = "3px";
+  // Set focus style: when focused, change border color to #9b7559
+  searchInput.addEventListener("focus", () => {
+    searchInput.style.border = "solid 1px #9b7559";
+  });
+  searchInput.addEventListener("blur", () => {
+    searchInput.style.border = "none";
+  });
+  
+  // Toggle search input visibility on button click
+  searchBtn.addEventListener("click", () => {
+    searchInput.style.display = searchInput.style.display === "none" ? "block" : "none";
+    if (searchInput.style.display !== "none") {
+      searchInput.focus();
+    }
+  });
+  
+  // Add elements to search container
+  searchContainer.appendChild(searchBtn);
+  searchContainer.appendChild(searchInput);
+  display.appendChild(searchContainer);
+  
+  // Create scrollable container for the console blocks
+  const consoleContainer = document.createElement("div");
+  consoleContainer.id = "consoleBlocksContainer";
+  consoleContainer.style.display = "flex";
+  consoleContainer.style.flexDirection = "column";
+  consoleContainer.style.alignItems = "center";
+  consoleContainer.style.justifyContent = "center";
+  consoleContainer.style.gap = "10px";
+  consoleContainer.style.overflowY = "auto";
+  consoleContainer.style.width = "100%";
+  consoleContainer.style.maxHeight = "calc(100% - 50px)"; // Leave room for search
+  display.appendChild(consoleContainer);
+
+  // Determine the two colors (background & text) from a .badge element; fallback provided
+  let badgeBg = "#9b7559", badgeColor = "#fff";
+  const badgeElem = document.querySelector('.badge');
+  if (badgeElem) {
+    badgeBg = getComputedStyle(badgeElem).backgroundColor;
+    badgeColor = getComputedStyle(badgeElem).color;
+  }
+
+  // Function to render filtered proposals
+  function renderFilteredProposals(proposals) {
+    consoleContainer.innerHTML = ""; // Clear existing blocks
+    
+    if (proposals.length === 0) {
+      const noResults = document.createElement("p");
+      noResults.textContent = "No matching proposals found";
+      noResults.style.color = "#949494";
+      noResults.style.textAlign = "center";
+      consoleContainer.appendChild(noResults);
+      return;
+    }
+    
+    // Render the filtered proposals
+    proposals.forEach((entry, index) => {
+      const proposalData = entry.displayBlocks ? entry.displayBlocks["proposalBlockDisplay-0"] : null;
+      const proposalNum = proposalData ? proposalData.pn || "N/A" : "N/A";
+      const proposalTitle = proposalData ? proposalData.title || "Untitled" : "Untitled";
+      const dateStr = new Date(entry.timestamp).toLocaleString();
+
+      // Create the block container
+      const block = document.createElement("div");
+      block.className = "display-block";
+      block.style.backgroundColor = badgeBg;
+      block.style.color = badgeColor;
+      block.style.width = "90%";
+      block.style.cursor = "pointer";
+      block.style.padding = "10px";
+      block.style.boxSizing = "border-box";
+      
+      // Create an info section for proposal number and title
+      const infoDiv = document.createElement("div");
+      infoDiv.style.textAlign = "center";
+      infoDiv.style.fontSize = "18px";
+      infoDiv.style.fontWeight = "normal";
+      infoDiv.textContent = `${proposalNum} - ${proposalTitle}`;
+      
+      // Timestamp in a smaller font below
+      const timeDiv = document.createElement("div");
+      timeDiv.style.textAlign = "center";
+      timeDiv.style.fontSize = "10px";
+      timeDiv.style.marginTop = "5px";
+      timeDiv.textContent = dateStr;
+      
+      block.appendChild(infoDiv);
+      block.appendChild(timeDiv);
+      
+      // When clicked, load this archived proposal
+      block.addEventListener("click", () => loadArchivedProposal(proposals.length - 1 - index));
+      consoleContainer.appendChild(block);
+    });
+  }
+  
+  // Initial render of all proposals (most recent first)
+  const reversedProposals = [...archivedProposals].reverse();
+  renderFilteredProposals(reversedProposals);
+  
+  // Filter proposals when search input changes
+  searchInput.addEventListener("input", () => {
+    const searchTerm = searchInput.value.toLowerCase().trim();
+    
+    if (!searchTerm) {
+      renderFilteredProposals(reversedProposals);
+      return;
+    }
+    
+    const filtered = reversedProposals.filter(entry => {
+      const proposalData = entry.displayBlocks ? entry.displayBlocks["proposalBlockDisplay-0"] : null;
+      if (!proposalData) return false;
+      
+      const proposalNum = (proposalData.pn || "").toLowerCase();
+      const proposalTitle = (proposalData.title || "").toLowerCase();
+      
+      return proposalNum.includes(searchTerm) || proposalTitle.includes(searchTerm);
+    });
+    
+    renderFilteredProposals(filtered);
+  });
+}
+
+/* ============================================================
+   EXTENDED DRAWER DISPLAY FUNCTION
+   ============================================================ */
+function renderDrawerDisplay() {
+    const display = document.querySelector('.drawer-display');
+    if (!display) return;
+
+    if (drawerState === "attachments") {
+        display.innerHTML = `
+      <div class="attachments-container">
+        <button id="addAttachmentBtn" class="add-plus">＋</button>
+        <div id="attachmentsList"></div>
+        <input type="file" id="attachmentInput" style="display:none" multiple>
+      </div>
+    `;
+        document.getElementById('addAttachmentBtn').addEventListener('click', () => {
+            document.getElementById('attachmentInput').click();
+        });
+        document.getElementById('attachmentInput').addEventListener('change', handleFiles);
+        setupDragAndDrop(display);
+        renderAttachmentsList();
+    } else if (drawerState === "email") {
+        display.innerHTML = `<p>No recent conversations</p>`;
+    } else if (drawerState === "console") {
+        // Render archived proposals with updated console blocks
+        renderConsoleBlocks();
+    }
+}
+
+/* ============================================================
+   SETUP DRAWER BUTTONS & INITIALIZATION
+   ============================================================ */
+function setupDrawerButtons() {
+  const emailBtn = document.getElementById("emailBtn-0");
+  if (emailBtn) {
+    emailBtn.addEventListener('click', function() {
+      drawerState = "email";
+      renderDrawerDisplay();
+    });
+  }
+  const attachmentsBtn = document.getElementById("attachmentsBtn-0");
+  if (attachmentsBtn) {
+    attachmentsBtn.addEventListener('click', function() {
+      drawerState = "attachments";
+      renderDrawerDisplay();
+    });
+  }
+  const consoleBtn = document.getElementById("consoleBtn-0");
+  if (consoleBtn) {
+    consoleBtn.addEventListener('click', function() {
+      drawerState = "console";
+      renderDrawerDisplay();
+    });
+  }
+}
+
+// Initialization on DOMContentLoaded for attachments, drawer buttons, and Archive button listener
+document.addEventListener("DOMContentLoaded", function() {
+  const savedAttachments = localStorage.getItem('attachments');
+  if (savedAttachments) {
+    attachments = JSON.parse(savedAttachments);
+  }
+  setupDrawerButtons();
+  renderDrawerDisplay();
+
+  // Add Archive button listener
+  const archiveBtn = document.getElementById("archiveBtn");
+  if (archiveBtn) {
+    archiveBtn.addEventListener("click", archiveCurrentProposal);
+  }
+});
+
+// ...existing attachment handling, file preview overlay, and other functions...
