@@ -1,15 +1,15 @@
 # FRAPROCCINO 0.5 Extension
 
-FRAPROCCINO 0.5 is a browser extension that assists users with proposal creation and budget management. The extension offers the following features:
+FRAPROCCINO 0.5 is a browser extension that assists users with proposal creation and budget management. 
 
 - **Proposal Management:**  
-  Create and update proposals with fields for proposal numbers, dates, titles, and budget details. Manage personnel and sponsor information using dynamic UI components.
+  Create and update proposals with fields for proposal numbers, dates, titles, and budget details. Keep all related items grouped by proposal number. 
 
 - **Keep up with Attachments:**  
-  Upload, preview, and manage attachments. Files can be added via drag-and-drop or file input. HTML rendering of previews for PDF, DOCX, Excel, and other file types.
+  Upload, preview, and manage attachments. Files can be added via drag-and-drop or file input. HTML rendering of previews for PDF, DOCX, Excel, and other file types for easy transfer to a webpage other applications.
 
 - **Budget Management:**  
-  Import and render budget data from active web pages, display budgets by fiscal periods, and update totals. Supports interactive period switching and Excel/PDF previews.
+  Import and render budget data from active web pages, display budgets by fiscal periods, and update totals. Supports  period switching and Excel/PDF previews.
 
 - **Archiving & Console:**  
   Archive complete proposals—including  data and attachments—for later retrieval. Use a console view to search and load archived proposals.
@@ -21,14 +21,20 @@ FRAPROCCINO 0.5 is a browser extension that assists users with proposal creation
 
 - **extension/**
   - `sidebar.js` – Main script for handling the side panel functions including proposal, attachments, budget, and archiving logic.
-  - `background.js`, `contentScript.js` – Scripts to support background tasks and page injection.
+  - `background.js`, `contentScript.js` – Scripts to support background messaging and page overlays.
   - `popup.html` & `popup.js` – Components for the extension’s popup interface.
   - `manifest.json` – Defines extension permissions and configuration.
 
 - **data/**  
   Contains JSON files such as `FRAPROP.json`, `mapping.json`, and `updated_streamlyne_map.json` used for sponsor and department lookup.
 
-- **images/**, **fonts/**, **libs/**  
+- **images/**,
+-UI assets
+
+- **fonts/**,
+- Duh
+  
+- **libs/**  
   Assets and libraries that support the interface and functionality.
 
 
