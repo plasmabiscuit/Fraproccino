@@ -111,6 +111,9 @@ button:hover {background-color:#494949
     background-color: rgb(86, 59, 8); /* Apply hover style to individual entries */
   }
 
+  #cfda-0::placeholder {
+    color: #fff;}
+
     /* Budget Page Styles */
     #budgetPage { margin-top: 10px; }
     #periodButtons { margin-bottom: 10px; text-align: center; }
@@ -275,55 +278,61 @@ button:hover {background-color:#494949
           <div id="periodButtons"></div>
           <!-- Budget Sections -->
           <div id="budgetSections">
-            <!-- Personnel Section -->
-            <div class="budget-section" id="section-Personnel">
+            <!-- Salary Section (replacing Personnel) -->
+            <div class="budget-section" id="section-Salary">
               <div class="section-header">
-                <h4>Personnel</h4>
-                <button id="addBudgetRow-Personnel">＋</button>
+                <h4>Salary</h4>
               </div>
-              <div class="section-content" id="content-Personnel"></div>
-              <div class="section-total" id="total-Personnel"></div>
+              <div class="section-content" id="content-Salary"></div>
+              <div class="section-total" id="total-Salary">Total: $0.00</div>
+            </div>
+            <!-- Fringe Section (new) -->
+            <div class="budget-section" id="section-Fringe">
+              <div class="section-header">
+                <h4>Fringe Benefits</h4>
+              </div>
+              <div class="section-content" id="content-Fringe"></div>
+              <div class="section-total" id="total-Fringe">Total: $0.00</div>
             </div>
             <!-- Equipment Section -->
             <div class="budget-section" id="section-Equipment">
               <div class="section-header">
                 <h4>Equipment</h4>
-                <button id="addBudgetRow-Equipment">＋</button>
               </div>
               <div class="section-content" id="content-Equipment"></div>
-              <div class="section-total" id="total-Equipment"></div>
+              <div class="section-total" id="total-Equipment">Total: $0.00</div>
             </div>
             <!-- Travel Section -->
             <div class="budget-section" id="section-Travel">
               <div class="section-header">
                 <h4>Travel</h4>
-                <button id="addBudgetRow-Travel">＋</button>
               </div>
               <div class="section-content" id="content-Travel"></div>
-              <div class="section-total" id="total-Travel"></div>
+              <div class="section-total" id="total-Travel">Total: $0.00</div>
             </div>
             <!-- Participant Support Section -->
             <div class="budget-section" id="section-ParticipantSupport">
               <div class="section-header">
                 <h4>Participant Support</h4>
-                <button id="addBudgetRow-ParticipantSupport">＋</button>
               </div>
               <div class="section-content" id="content-ParticipantSupport"></div>
-              <div class="section-total" id="total-ParticipantSupport"></div>
+              <div class="section-total" id="total-ParticipantSupport">Total: $0.00</div>
             </div>
             <!-- Other Direct Section -->
             <div class="budget-section" id="section-OtherDirect">
               <div class="section-header">
                 <h4>Other Direct</h4>
-                <button id="addBudgetRow-OtherDirect">＋</button>
               </div>
               <div class="section-content" id="content-OtherDirect"></div>
-              <div class="section-total" id="total-OtherDirect"></div>
+              <div class="section-total" id="total-OtherDirect">Total: $0.00</div>
             </div>
           </div>
         </div>
-        <!-- Back Button -->
-        <button id="backBtn-0">Back</button>
+        <!-- Import Budget and Back buttons -->
+        <div style="display: flex; justify-content: space-between; margin-top: 10px;">
+          <button id="importBudgetBtn">Import Budget</button>
+          <button id="backBtn-0">Back</button>
+        </div>
       </div>
     </div>
   </div>

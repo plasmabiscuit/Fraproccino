@@ -1,3 +1,14 @@
+// Fallback for chrome.runtime used during Live Server testing
+if (typeof chrome === 'undefined') {
+  window.chrome = {};
+}
+if (!chrome.runtime) {
+  chrome.runtime = {
+      getURL: (path) => path // returns the provided path without modifying it
+      // Remove before final build
+  };
+}
+
 /* ============================================================
    PERSISTENCE FOR DISPLAY-BLOCKS
    ============================================================ */
@@ -107,7 +118,7 @@ function restoreDisplayBlocks() {
       <span class="badge">${data["Sponsor Code"]}</span>
       <span class="badge">${data["Banner ID"]}</span>`;
     if (data["Sponsor Type"] && data["Sponsor Type"].toLowerCase() === "federal") {
-      badgesHTML += `<span class="badge"><input type="text" id="cfda-0" placeholder="CFDA" style="width:50px; font-size:0.7em; border:none; background:transparent;"></span>`;
+      badgesHTML += `<span class="badge"><input type="text" id="cfda-0" placeholder="CFDA" style="width:50px; font-size:0.7em; border:none; background:transparent; color:#fff;"></span>`;
     }
     badgesHTML += `</div>`;
     const block = document.createElement("div");
@@ -561,6 +572,7 @@ function hideDeptResults(resultsDivId) {
 */
 let budgetInitialized = false;
 let budgetPeriods = [];
+let budgetData = {}; // Object to store parsed budget data
 
 function computePeriods() {
   const startStr = document.getElementById("projectStart-0").value;
@@ -599,184 +611,441 @@ function initializeBudgetPage() {
   totalBtn.addEventListener("click", function() { showBudgetPeriod("Total"); });
   periodButtonsDiv.appendChild(totalBtn);
   
+  // Configure back button
+  document.getElementById("backBtn-0").addEventListener("click", function() {
+    switchCardPage(0, 1); // Switch back to proposal page
+  });
+  
   // Default: show period 1
   showBudgetPeriod(1);
-  // Populate Personnel section from page 1
-  populatePersonnelFromPage1();
+  
+  // Load any previously saved budget data
+  loadBudgetData();
 }
+
+// New function to load saved budget data
+function loadBudgetData() {
+  const savedData = localStorage.getItem("budgetData");
+  if (savedData) {
+    budgetData = JSON.parse(savedData);
+    renderBudgetData(budgetData);
+  }
+}
+
+// Function to save budget data
+function saveBudgetData() {
+  localStorage.setItem("budgetData", JSON.stringify(budgetData));
+}
+
+let currentBudgetPeriod = 1;
 
 function showBudgetPeriod(period) {
-  console.log("Switched to period", period);
-  // TODO: Clone rows from period 1 when switching periods.
-}
-
-function populatePersonnelFromPage1() {
-  const personnelBlocks = document.querySelectorAll("#personnelContainer-0 .display-block.personnel-block");
-  const contentDiv = document.getElementById("content-Personnel");
-  contentDiv.innerHTML = "";
-  personnelBlocks.forEach(block => {
-    const text = block.querySelector(".block-content").textContent.trim();
-    const parts = text.split(" ");
-    const lastName = parts[parts.length - 1];
-    
-    // Create a budget row for personnel
-    const row = document.createElement("div");
-    row.classList.add("budget-row");
-    
-    const nameSpan = document.createElement("span");
-    nameSpan.textContent = lastName;
-    row.appendChild(nameSpan);
-    
-    const salaryInput = document.createElement("input");
-    salaryInput.type = "number";
-    salaryInput.placeholder = "Salary";
-    salaryInput.addEventListener("blur", function() { updateLineTotal(salaryInput); });
-    salaryInput.style.background = "#3a3a3a";
-    salaryInput.style.color = "#949494";
-    row.appendChild(salaryInput);
-    
-    const fringeInput = document.createElement("input");
-    fringeInput.type = "number";
-    fringeInput.placeholder = "Fringe";
-    fringeInput.addEventListener("blur", function() { updateLineTotal(fringeInput); });
-    fringeInput.style.background = "#3a3a3a";
-    fringeInput.style.color = "#949494";
-    row.appendChild(fringeInput);
-    
-    const lineTotalSpan = document.createElement("span");
-    lineTotalSpan.className = "line-total";
-    row.appendChild(lineTotalSpan);
-    
-    const removeSpan = document.createElement("span");
-    removeSpan.className = "remove-budget-row";
-    removeSpan.textContent = "×";
-    removeSpan.addEventListener("click", function() { removeBudgetRow(removeSpan); });
-    row.appendChild(removeSpan);
-    
-    contentDiv.appendChild(row);
-  });
-  contentDiv.setAttribute("data-period1", contentDiv.innerHTML);
-  updateSectionTotal("Personnel");
-}
-
-function updateLineTotal(inputElem) {
-  const row = inputElem.closest(".budget-row");
-  const salary = parseFloat(row.children[1].value) || 0;
-  const fringe = parseFloat(row.children[2].value) || 0;
-  const total = salary + fringe;
-  row.querySelector(".line-total").textContent = total > 0 ? total.toFixed(2) : "";
-  updateSectionTotal("Personnel");
-}
-
-function removeBudgetRow(btn) {
-  const row = btn.closest(".budget-row");
-  row.remove();
-  const section = row.parentElement.id.split("-")[1];
-  updateSectionTotal(section);
-}
-
-function addBudgetRow(section) {
-  const contentDiv = document.getElementById("content-" + section);
-  let row = document.createElement("div");
-  row.classList.add("budget-row");
-  if (section === "Personnel") {
-    // Build personnel budget row elements
-    const lastNameInput = document.createElement("input");
-    lastNameInput.type = "text";
-    lastNameInput.placeholder = "Last Name";
-    lastNameInput.style.background = "#3a3a3a";
-    lastNameInput.style.color = "#949494";
-    lastNameInput.addEventListener("blur", function() { updateLineTotal(lastNameInput); });
-    row.appendChild(lastNameInput);
-    
-    const salaryInput = document.createElement("input");
-    salaryInput.type = "number";
-    salaryInput.placeholder = "Salary";
-    salaryInput.style.background = "#3a3a3a";
-    salaryInput.style.color = "#949494";
-    salaryInput.addEventListener("blur", function() { updateLineTotal(salaryInput); });
-    row.appendChild(salaryInput);
-    
-    const fringeInput = document.createElement("input");
-    fringeInput.type = "number";
-    fringeInput.placeholder = "Fringe";
-    fringeInput.style.background = "#3a3a3a";
-    fringeInput.style.color = "#949494";
-    fringeInput.addEventListener("blur", function() { updateLineTotal(fringeInput); });
-    row.appendChild(fringeInput);
-    
-    const lineTotalSpan = document.createElement("span");
-    lineTotalSpan.className = "line-total";
-    row.appendChild(lineTotalSpan);
-    
-    const removeSpan = document.createElement("span");
-    removeSpan.className = "remove-budget-row";
-    removeSpan.textContent = "×";
-    removeSpan.addEventListener("click", function() { removeBudgetRow(removeSpan); });
-    row.appendChild(removeSpan);
-  } else {
-    // Build non-personnel budget row elements
-    const containerDiv = document.createElement("div");
-    containerDiv.style.display = "flex";
-    containerDiv.style.flexDirection = "column";
-    containerDiv.style.width = "328px";
-    containerDiv.style.color = "#949494";
-
-    const selectElem = document.createElement("select");
-    selectElem.addEventListener("change", function() { updateSectionTotal(section); });
-    let option1 = document.createElement("option");
-    option1.value = "";
-    option1.textContent = "Select Type";
-    selectElem.appendChild(option1);
-    let option2 = document.createElement("option");
-    option2.value = "Option1";
-    option2.textContent = section + " Option 1";
-    selectElem.appendChild(option2);
-    let option3 = document.createElement("option");
-    option3.value = "Option2";
-    option3.textContent = section + " Option 2";
-    selectElem.appendChild(option3);
-    containerDiv.appendChild(selectElem);
-    
-    const descriptionInput = document.createElement("input");
-    descriptionInput.type = "text";
-    descriptionInput.placeholder = "Description";
-    descriptionInput.addEventListener("blur", function() { updateSectionTotal(section); });
-    containerDiv.appendChild(descriptionInput);
-    
-    const amountInput = document.createElement("input");
-    amountInput.type = "number";
-    amountInput.placeholder = "Amount";
-    amountInput.addEventListener("blur", function() { updateSectionTotal(section); });
-    containerDiv.appendChild(amountInput);
-    
-    const removeSpan = document.createElement("span");
-    removeSpan.className = "remove-budget-row";
-    removeSpan.textContent = "×";
-    removeSpan.addEventListener("click", function() { removeBudgetRow(removeSpan); });
-    containerDiv.appendChild(removeSpan);
-    
-    row.appendChild(containerDiv);
-  }
-  contentDiv.appendChild(row);
-  updateSectionTotal(section);
-}
-
-function updateSectionTotal(section) {
-  const contentDiv = document.getElementById("content-" + section);
-  let total = 0;
-  const rows = contentDiv.querySelectorAll(".budget-row");
-  rows.forEach(row => { 
-    if (section === "Personnel") {
-      const lineTotal = parseFloat(row.querySelector(".line-total").textContent) || 0;
-      total += lineTotal;
+  currentBudgetPeriod = period;
+  
+  // Set active state on period buttons
+  document.querySelectorAll("#periodButtons button").forEach((btn, idx) => {
+    if ((typeof period === "number" && idx === period - 1) || 
+        (period === "Total" && btn.textContent === "Total")) {
+      btn.style.backgroundColor = "#9b7559";
     } else {
-      const amount = parseFloat(row.children[2].value) || 0;
-      total += amount;
+      btn.style.backgroundColor = "#3a3a3a";
     }
   });
-  document.getElementById("total-" + section).textContent = "Total: " + total.toFixed(2);
+
+  // Render budget data for selected period
+  renderBudgetDataForPeriod(period);
 }
+
+function renderBudgetDataForPeriod(period) {
+  // Clear all section contents
+  document.querySelectorAll(".section-content").forEach(section => {
+    section.innerHTML = "";
+  });
+  
+  // Reset all section totals
+  document.querySelectorAll(".section-total").forEach(totalElem => {
+    totalElem.textContent = "Total: $0.00";
+  });
+  
+  // If we have budget data, render it
+  if (Object.keys(budgetData).length > 0) {
+    renderBudgetData(budgetData, period);
+  }
+}
+
+// Function to extract budget data from the current active tab and populate the budget sections
+function extractBudgetCategories() {
+  return new Promise((resolve, reject) => {
+    // We need to execute script in the context of the active tab to extract budget data
+    chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+      if (!tabs || tabs.length === 0) {
+        reject("No active tab found");
+        return;
+      }
+      
+      // Execute a script in the context of the active tab
+      chrome.scripting.executeScript({
+        target: { tabId: tabs[0].id },
+        function: extractBudgetFromPage
+      }, (results) => {
+        if (chrome.runtime.lastError) {
+          console.error("Error executing script:", chrome.runtime.lastError);
+          reject(chrome.runtime.lastError.message);
+          return;
+        }
+        
+        if (!results || results.length === 0 || !results[0].result) {
+          reject("No budget data found");
+          return;
+        }
+        
+        resolve(results[0].result);
+      });
+    });
+  });
+}
+
+// This function is injected into the active tab to extract budget data
+function extractBudgetFromPage() {
+    // Iterate over all tables in the page
+    const allTables = document.querySelectorAll('table');
+    const keywords = ['salary', 'fringe', 'equipment', 'travel', 'participant', 'direct', 'tuition'];
+    let targetTable = null;
+
+    allTables.forEach(tbl => {
+        const tableText = tbl.innerText.toLowerCase();
+        if (keywords.some(keyword => tableText.includes(keyword))) {
+            targetTable = tbl;
+        }
+    });
+
+    if (!targetTable) {
+        console.error("No budget table found with matching categories.");
+        return null;
+    }
+    
+    // ...existing code initializations...
+    const data = {}; // Will store parsed budget data.
+    let currentCategory = null;
+    let currentHeader = null;
+    let currentItems = [];
+    let currentSubcategory = null;
+
+    // Use targetTable instead of the original table element.
+    const rows = Array.from(targetTable.querySelectorAll('tr'));
+    // ...existing parsing logic...
+    
+    // Finalize and return the data object.
+    return data;
+}
+
+// Import budget data from current page and populate budget sections
+function importBudget() {
+  // Show a loading message
+  const importBtn = document.getElementById("importBudgetBtn");
+  const originalText = importBtn.textContent;
+  importBtn.textContent = "Loading...";
+  importBtn.disabled = true;
+
+  // Extract budget data using Promise
+  extractBudgetCategories()
+    .then(extractedData => {
+      if (!extractedData || Object.keys(extractedData).length === 0) {
+        alert("No budget data found. Make sure you're viewing a page with the budget table.");
+        return;
+      }
+
+      // Store the extracted data
+      budgetData = extractedData;
+      
+      // Save to localStorage
+      saveBudgetData();
+      
+      // Render the budget data
+      renderBudgetData(budgetData);
+      
+      // Show success message
+      alert("Budget data successfully imported!");
+    })
+    .catch(error => {
+      // Show error message
+      alert("Error importing budget: " + error);
+      console.error("Import error:", error);
+    })
+    .finally(() => {
+      // Restore button state
+      importBtn.textContent = originalText;
+      importBtn.disabled = false;
+    });
+}
+
+// Render budget data for all sections
+function renderBudgetData(data, specificPeriod = null) {
+  // For each budget category, find or create a corresponding section
+  Object.keys(data).forEach(categoryName => {
+    const categoryData = data[categoryName];
+    
+    // Map category names to section IDs (or create new sections)
+    let sectionId;
+    if (categoryName.toLowerCase().includes('salary') || 
+        categoryName.toLowerCase().includes('salaries')) {
+      sectionId = 'section-Salary';
+    } else if (categoryName.toLowerCase().includes('fringe')) {
+      sectionId = 'section-Fringe';
+    } else if (categoryName.toLowerCase().includes('equipment')) {
+      sectionId = 'section-Equipment';
+    } else if (categoryName.toLowerCase().includes('travel')) {
+      sectionId = 'section-Travel';
+    } else if (categoryName.toLowerCase().includes('participant')) {
+      sectionId = 'section-ParticipantSupport';
+    } else if (categoryName.toLowerCase().includes('direct')) {
+      sectionId = 'section-OtherDirect';
+    } else if (categoryName.toLowerCase().includes('tuition')) {
+      // Check if we need to create a section for tuition
+      if (!document.getElementById('section-Tuition')) {
+        createBudgetSection('Tuition');
+      }
+      sectionId = 'section-Tuition';
+    } else {
+      // Create a new section for this category if it doesn't exist
+      const sectionNameNoSpaces = categoryName.replace(/\s+/g, '');
+      if (!document.getElementById(`section-${sectionNameNoSpaces}`)) {
+        createBudgetSection(categoryName);
+      }
+      sectionId = `section-${sectionNameNoSpaces}`;
+    }
+    
+    // Find the section content element
+    const sectionContent = document.getElementById(`content-${sectionId.split('-')[1]}`);
+    if (!sectionContent) {
+      console.error(`Section content element not found for ${categoryName}`);
+      return;
+    }
+    
+    // Clear the section if we're rendering a specific period or first time rendering
+    if (specificPeriod !== null) {
+      sectionContent.innerHTML = '';
+    }
+    
+    // Render items for this category
+    renderCategoryItems(categoryData.items, sectionContent, specificPeriod);
+    
+    // Update section total
+    const periodIndex = specificPeriod === "Total" ? -2 : (specificPeriod ? specificPeriod - 1 : 0);
+    updateSectionTotalFromData(categoryData, sectionId, periodIndex);
+  });
+}
+
+// Create a new budget section dynamically
+function createBudgetSection(categoryName) {
+  const sectionNameNoSpaces = categoryName.replace(/\s+/g, '');
+  const budgetSections = document.getElementById('budgetSections');
+  
+  const section = document.createElement('div');
+  section.className = 'budget-section';
+  section.id = `section-${sectionNameNoSpaces}`;
+  
+  section.innerHTML = `
+    <div class="section-header">
+      <h4>${categoryName}</h4>
+    </div>
+    <div class="section-content" id="content-${sectionNameNoSpaces}"></div>
+    <div class="section-total" id="total-${sectionNameNoSpaces}">Total: $0.00</div>
+  `;
+  
+  budgetSections.appendChild(section);
+}
+
+// Render items for a category
+function renderCategoryItems(items, container, specificPeriod) {
+  items.forEach(item => {
+    if (item.isSubcategory) {
+      // Render subcategory header
+      const subcategoryHeader = document.createElement('div');
+      subcategoryHeader.className = 'subcategory-header';
+      subcategoryHeader.textContent = item.header[0]; // First cell contains subcategory name
+      subcategoryHeader.style.fontWeight = 'bold';
+      subcategoryHeader.style.marginTop = '8px';
+      subcategoryHeader.style.marginBottom = '5px';
+      container.appendChild(subcategoryHeader);
+      
+      // Render items in the subcategory
+      renderCategoryItems(item.items, container, specificPeriod);
+    } else {
+      // Render regular line item
+      const row = document.createElement('div');
+      row.className = 'budget-row';
+      
+      // Description column
+      const descriptionDiv = document.createElement('div');
+      descriptionDiv.className = 'budget-item-description';
+      descriptionDiv.textContent = item.description;
+      descriptionDiv.style.width = '45%';
+      descriptionDiv.style.overflow = 'hidden';
+      descriptionDiv.style.textOverflow = 'ellipsis';
+      descriptionDiv.style.whiteSpace = 'nowrap';
+      row.appendChild(descriptionDiv);
+      
+      // Amount column - changes based on if we're showing a specific period or not
+      const amountDiv = document.createElement('div');
+      amountDiv.className = 'budget-item-amount';
+      amountDiv.style.width = '30%';
+      
+      let amount;
+      if (specificPeriod === "Total") {
+        // Show the overall total
+        amount = parseFloat(item.overallTotals[0].replace(/[$,]/g, ''));
+      } else if (specificPeriod && item.sponsorCosts[specificPeriod - 1]) {
+        // Show the sponsor cost for the specific period
+        amount = parseFloat(item.sponsorCosts[specificPeriod - 1].replace(/[$,]/g, ''));
+      } else {
+        // Default to first period
+        amount = parseFloat(item.sponsorCosts[0].replace(/[$,]/g, ''));
+      }
+      
+      amountDiv.textContent = formatCurrency(amount);
+      row.appendChild(amountDiv);
+      
+      // Cost Share column - only show if not omitted
+      if (!item.omitCostShare) {
+        const costShareDiv = document.createElement('div');
+        costShareDiv.className = 'budget-item-costshare';
+        costShareDiv.style.width = '25%';
+        
+        let costShare;
+        if (specificPeriod === "Total") {
+          costShare = parseFloat(item.overallTotals[1].replace(/[$,]/g, ''));
+        } else if (specificPeriod && item.costShares[specificPeriod - 1]) {
+          costShare = parseFloat(item.costShares[specificPeriod - 1].replace(/[$,]/g, ''));
+        } else {
+          costShare = parseFloat(item.costShares[0].replace(/[$,]/g, ''));
+        }
+        
+        costShareDiv.textContent = formatCurrency(costShare);
+        row.appendChild(costShareDiv);
+      }
+      
+      container.appendChild(row);
+    }
+  });
+}
+
+// Helper function to format currency values
+function formatCurrency(value) {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD'
+  }).format(value);
+}
+
+// Update section total based on data for a specific period
+function updateSectionTotalFromData(categoryData, sectionId, periodIndex) {
+  const sectionName = sectionId.split('-')[1];
+  let total = 0;
+  
+  // Calculate total from all items in the category
+  function addItemsTotal(items) {
+    items.forEach(item => {
+      if (item.isSubcategory) {
+        addItemsTotal(item.items);
+      } else {
+        let value;
+        if (periodIndex === -2) { // Total across all periods
+          value = parseFloat(item.overallTotals[0].replace(/[$,]/g, '')) || 0;
+        } else {
+          value = parseFloat(item.sponsorCosts[periodIndex].replace(/[$,]/g, '')) || 0;
+        }
+        total += value;
+      }
+    });
+  }
+  
+  addItemsTotal(categoryData.items);
+  
+  // Update the total display
+  const totalElem = document.getElementById(`total-${sectionName}`);
+  if (totalElem) {
+    totalElem.textContent = `Total: ${formatCurrency(total)}`;
+  }
+}
+
+function showBudgetPage() {
+  switchCardPage(0, 2);
+  if (!budgetInitialized) {
+    initializeBudgetPage();
+    budgetInitialized = true;
+  }
+}
+
+// Modify saveAllFormData to include budget data
+const originalSaveAllFormData = saveAllFormData;
+saveAllFormData = function() {
+  originalSaveAllFormData();
+  saveBudgetData();
+};
+
+// Include loading budget data when the page loads
+document.addEventListener("DOMContentLoaded", function() {
+  // ...existing code...
+  
+  // Configure Import Budget button
+  const importBudgetBtn = document.getElementById("importBudgetBtn");
+  if (importBudgetBtn) {
+    importBudgetBtn.addEventListener("click", importBudget);
+  }
+  
+  // Configure back button
+  const backBtn = document.getElementById("backBtn-0");
+  if (backBtn) {
+    backBtn.addEventListener("click", function() {
+      switchCardPage(0, 1); // Switch back to proposal page
+    });
+  }
+});
+
+// Include budget data in the archive process
+const originalArchiveCurrentProposal = archiveCurrentProposal;
+archiveCurrentProposal = function() {
+  // Get budget data first
+  const currentBudgetData = localStorage.getItem("budgetData");
+  
+  // Call original function
+  originalArchiveCurrentProposal();
+  
+  // Retrieve the latest archived proposals
+  let archivedProposals = JSON.parse(localStorage.getItem("archivedProposals") || "[]");
+  
+  // Add budget data to the most recent archive if it exists
+  if (archivedProposals.length > 0 && currentBudgetData) {
+    archivedProposals[archivedProposals.length - 1].budgetData = JSON.parse(currentBudgetData);
+    localStorage.setItem("archivedProposals", JSON.stringify(archivedProposals));
+  }
+};
+
+// Modify loadArchivedProposal to load budget data too
+const originalLoadArchivedProposal = loadArchivedProposal;
+loadArchivedProposal = function(archiveIndex) {
+  let archivedProposals = JSON.parse(localStorage.getItem("archivedProposals") || "[]");
+  if (!archivedProposals[archiveIndex]) return;
+  const entry = archivedProposals[archiveIndex];
+  
+  // Load budget data if it exists
+  if (entry.budgetData) {
+    localStorage.setItem("budgetData", JSON.stringify(entry.budgetData));
+  } else {
+    localStorage.removeItem("budgetData");
+  }
+  
+  // Call original function
+  originalLoadArchivedProposal(archiveIndex);
+};
+
+// Modify clearSidePanel to clear budget data too
+const originalClearSidePanel = clearSidePanel;
+clearSidePanel = function() {
+  originalClearSidePanel();
+  localStorage.removeItem("budgetData");
+};
 
 
 /* ============================================================
@@ -803,6 +1072,18 @@ function getFileIcon(file) {
   } else {
     return chrome.runtime.getURL('/images/generic.png');
   }
+}
+
+// NEW: Helper function to add or replace an attachment
+function addOrReplaceAttachment(file, fileData) {
+    const index = attachments.findIndex(att => att.name === file.name);
+    if (index >= 0) {
+        attachments[index] = { name: file.name, type: file.type, data: fileData };
+    } else {
+        attachments.push({ name: file.name, type: file.type, data: fileData });
+    }
+    localStorage.setItem('attachments', JSON.stringify(attachments));
+    renderAttachmentsList();
 }
 
 // Function to render the content of the .drawer-display based on drawerState
@@ -835,16 +1116,14 @@ function renderDrawerDisplay() {
   }
 }
 
-// Function to handle file selection from the hidden input
+// Modified: Function to handle file selection from the hidden input
 function handleFiles(event) {
   const files = event.target.files;
   if (files.length) {
     Array.from(files).forEach(file => {
       const reader = new FileReader();
       reader.onload = function(e) {
-        attachments.push({ name: file.name, type: file.type, data: e.target.result });
-        localStorage.setItem('attachments', JSON.stringify(attachments));
-        renderAttachmentsList();
+        addOrReplaceAttachment(file, e.target.result);
       };
       reader.readAsDataURL(file);
     });
@@ -868,9 +1147,7 @@ function setupDragAndDrop(container) {
       Array.from(droppedFiles).forEach(file => {
         const reader = new FileReader();
         reader.onload = function(e) {
-          attachments.push({ name: file.name, type: file.type, data: e.target.result });
-          localStorage.setItem('attachments', JSON.stringify(attachments));
-          renderAttachmentsList();
+          addOrReplaceAttachment(file, e.target.result);
         };
         reader.readAsDataURL(file);
       });
@@ -992,7 +1269,7 @@ function addPdfNavigationControls(numPages) {
   navDiv.style.display = 'flex';
   navDiv.style.justifyContent = 'center';
   navDiv.style.alignItems = 'center';
-  navDiv.style.marginTop = '10px';
+  navDiv.style.marginBottom = '10px';
   
   const prevBtn = document.createElement('button');
   prevBtn.textContent = 'Previous';
@@ -1183,8 +1460,7 @@ function renderAttachmentsList() {
 
 /* ============================================================
    SETUP DRAWER BUTTONS & INITIALIZATION
-   ============================================================
-*/
+   ============================================================ */
 function setupDrawerButtons() {
   const emailBtn = document.getElementById("emailBtn-0");
   if (emailBtn) {
@@ -1230,7 +1506,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const lastInput = firstPersonnelRow.querySelector(".person-last");
     const deptInput = firstPersonnelRow.querySelector(".person-dept");
     if (firstInput) firstInput.addEventListener("blur", function() { checkAndUpdatePersonnel(this); });
-    if (lastInput) lastInput.addEventListener("blur", function() { checkAndUpdatePersonnel(this); });
+    if (lastInput) firstInput.addEventListener("blur", function() { checkAndUpdatePersonnel(this); });
     if (deptInput) {
       deptInput.addEventListener("input", function() { searchDept(this, 'deptResults-pi'); });
       deptInput.addEventListener("blur", function() { hideDeptResults('deptResults-pi'); });
@@ -1263,60 +1539,98 @@ document.addEventListener("DOMContentLoaded", function() {
 
 // Archives the current sidepanel state
 function archiveCurrentProposal() {
-    // Gather current form data and display blocks from localStorage
-    const formData = localStorage.getItem("sidebarFormData");
-    const displayBlocks = localStorage.getItem("sidebarDisplayBlocks");
-    // Archive current attachments (assumed to be managed in a global variable)
-    const archiveEntry = {
-        timestamp: Date.now(),
-        formData: formData ? JSON.parse(formData) : {},
-        displayBlocks: displayBlocks ? JSON.parse(displayBlocks) : {},
-        attachments: attachments   // attachments stored as an array
-    };
+  // Gather current form data and display blocks from localStorage
+  const formData = localStorage.getItem("sidebarFormData");
+  const displayBlocks = localStorage.getItem("sidebarDisplayBlocks");
+  const parsedDisplayBlocks = displayBlocks ? JSON.parse(displayBlocks) : {};
+  
+  // Get the proposal number from the display blocks
+  const proposalData = parsedDisplayBlocks["proposalBlockDisplay-0"];
+  const currentProposalNumber = proposalData ? proposalData.pn : null;
+  
+  // Create archive entry with timestamp and current state
+  const archiveEntry = {
+    timestamp: Date.now(),
+    formData: formData ? JSON.parse(formData) : {},
+    displayBlocks: parsedDisplayBlocks,
+    attachments: attachments
+  };
 
-    // Retrieve existing archives
-    let archivedProposals = JSON.parse(localStorage.getItem("archivedProposals") || "[]");
+  // Retrieve existing archives
+  let archivedProposals = JSON.parse(localStorage.getItem("archivedProposals") || "[]");
+  
+  // Check if a proposal with the same number already exists
+  const existingIndex = currentProposalNumber ? 
+    archivedProposals.findIndex(p => 
+      p.displayBlocks && 
+      p.displayBlocks["proposalBlockDisplay-0"] && 
+      p.displayBlocks["proposalBlockDisplay-0"].pn === currentProposalNumber
+    ) : -1;
+  
+  if (existingIndex !== -1) {
+    // Overwrite existing proposal
+    archivedProposals[existingIndex] = archiveEntry;
+  } else {
+    // Add as new proposal
     archivedProposals.push(archiveEntry);
-    // For entries older than the 20 most recent, remove attachments to conserve space
-    if (archivedProposals.length > 20) {
-        for (let i = 0; i < archivedProposals.length - 20; i++) {
-            archivedProposals[i].attachments = null;
-        }
+  }
+  
+  // For entries older than the 20 most recent, remove attachments to conserve space
+  if (archivedProposals.length > 20) {
+    for (let i = 0; i < archivedProposals.length - 20; i++) {
+      archivedProposals[i].attachments = null;
     }
-    localStorage.setItem("archivedProposals", JSON.stringify(archivedProposals));
+  }
+  
+  // Save updated archives
+  localStorage.setItem("archivedProposals", JSON.stringify(archivedProposals));
 
-    // Clear the current sidepanel state
-    clearSidePanel();
-    // Reload to reflect the cleared state
-    location.reload();
+  // Clear the current sidepanel state
+  clearSidePanel();
+  
+  // Reload to reflect the cleared state
+  location.reload();
+}
+
+// Delete an archived proposal by its index
+function deleteArchivedProposal(index) {
+  let archivedProposals = JSON.parse(localStorage.getItem("archivedProposals") || "[]");
+  // Remove the proposal at the specified index
+  archivedProposals.splice(index, 1);
+  // Save the updated array
+  localStorage.setItem("archivedProposals", JSON.stringify(archivedProposals));
+  // Re-render the console blocks
+  renderConsoleBlocks();
 }
 
 // Clears the sidepanel state (form data, display blocks, and attachments)
 function clearSidePanel() {
-    localStorage.removeItem("sidebarFormData");
-    localStorage.removeItem("sidebarDisplayBlocks");
-    attachments = [];
-    localStorage.setItem('attachments', JSON.stringify(attachments));
-    // Optionally, clear any visible fields if needed.
+  localStorage.removeItem("sidebarFormData");
+  localStorage.removeItem("sidebarDisplayBlocks");
+  attachments = [];
+  localStorage.setItem('attachments', JSON.stringify(attachments));
 }
 
 // Loads an archived proposal into the sidepanel by its index in the archivedProposals array
 function loadArchivedProposal(archiveIndex) {
-    let archivedProposals = JSON.parse(localStorage.getItem("archivedProposals") || "[]");
-    if (!archivedProposals[archiveIndex]) return;
-    const entry = archivedProposals[archiveIndex];
-    // Restore state into localStorage
-    localStorage.setItem("sidebarFormData", JSON.stringify(entry.formData));
-    localStorage.setItem("sidebarDisplayBlocks", JSON.stringify(entry.displayBlocks));
-    if (entry.attachments) {
-      attachments = entry.attachments;
-      localStorage.setItem("attachments", JSON.stringify(attachments));
-    } else {
-      attachments = [];
-      localStorage.setItem("attachments", JSON.stringify(attachments));
-    }
-    // Reload to repopulate the UI with restored data
-    location.reload();
+  let archivedProposals = JSON.parse(localStorage.getItem("archivedProposals") || "[]");
+  if (!archivedProposals[archiveIndex]) return;
+  const entry = archivedProposals[archiveIndex];
+  
+  // Restore state into localStorage
+  localStorage.setItem("sidebarFormData", JSON.stringify(entry.formData));
+  localStorage.setItem("sidebarDisplayBlocks", JSON.stringify(entry.displayBlocks));
+  
+  if (entry.attachments) {
+    attachments = entry.attachments;
+    localStorage.setItem("attachments", JSON.stringify(attachments));
+  } else {
+    attachments = [];
+    localStorage.setItem("attachments", JSON.stringify(attachments));
+  }
+  
+  // Reload to repopulate the UI with restored data
+  location.reload();
 }
 
 // UPDATED: Render archived proposals in the console drawer-display area
@@ -1428,6 +1742,7 @@ function renderConsoleBlocks() {
       block.style.cursor = "pointer";
       block.style.padding = "10px";
       block.style.boxSizing = "border-box";
+      block.style.position = "relative"; // For delete button positioning
       
       // Create an info section for proposal number and title
       const infoDiv = document.createElement("div");
@@ -1446,8 +1761,46 @@ function renderConsoleBlocks() {
       block.appendChild(infoDiv);
       block.appendChild(timeDiv);
       
+      // Add delete button (X) to the corner
+      const deleteBtn = document.createElement("button");
+      deleteBtn.className = "remove-block";
+      deleteBtn.textContent = "×";
+      deleteBtn.style.position = "absolute";
+      deleteBtn.style.top = "5px";
+      deleteBtn.style.right = "5px";
+      deleteBtn.style.backgroundColor = "rgba(255, 0, 0, 0.7)";
+      deleteBtn.style.color = "#fff";
+      deleteBtn.style.border = "none";
+      deleteBtn.style.borderRadius = "50%";
+      deleteBtn.style.width = "20px";
+      deleteBtn.style.height = "20px";
+      deleteBtn.style.lineHeight = "18px";
+      deleteBtn.style.textAlign = "center";
+      deleteBtn.style.cursor = "pointer";
+      deleteBtn.style.display = "none"; // Initially hidden, show on hover
+      
+      // Show delete button on hover
+      block.addEventListener("mouseenter", () => {
+        deleteBtn.style.display = "block";
+      });
+      
+      block.addEventListener("mouseleave", () => {
+        deleteBtn.style.display = "none";
+      });
+      
+      // Delete button click handler
+      deleteBtn.addEventListener("click", (e) => {
+        e.stopPropagation(); // Prevent triggering the block's click event
+        // Confirm before deleting
+        if (confirm(`Delete proposal ${proposalNum}?`)) {
+          deleteArchivedProposal(archivedProposals.length - 1 - index);
+        }
+      });
+      
+      block.appendChild(deleteBtn);
+      
       // When clicked, load this archived proposal
-      block.addEventListener("click", () => loadArchivedProposal(proposals.length - 1 - index));
+      block.addEventListener("click", () => loadArchivedProposal(archivedProposals.length - 1 - index));
       consoleContainer.appendChild(block);
     });
   }
@@ -1501,7 +1854,7 @@ function renderDrawerDisplay() {
         setupDragAndDrop(display);
         renderAttachmentsList();
     } else if (drawerState === "email") {
-        display.innerHTML = `<p>No recent conversations</p>`;
+        display.innerHTML = `<p style="text-align: center;">No recent conversations</p>`;
     } else if (drawerState === "console") {
         // Render archived proposals with updated console blocks
         renderConsoleBlocks();
@@ -1551,4 +1904,3 @@ document.addEventListener("DOMContentLoaded", function() {
   }
 });
 
-// ...existing attachment handling, file preview overlay, and other functions...
