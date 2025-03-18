@@ -48,5 +48,8 @@ FRAPROCCINO 0.5 is a browser extension that assists users with proposal creation
 ## Development To Do
 
   -Authentication/Email sync
+  
   -Confingurable mapping editor
+  
   -Outlook/ToDo integration via VisualBasic Office script.
+  
