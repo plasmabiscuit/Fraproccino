@@ -1,7 +1,7 @@
-![Coffee](FRAPROCCINO_1.5/images/Coffee.gif)
+![Coffee](FRAPROCCINO_1.5/images/alt-Coffee.gif)
 
-# 
-FRAPROCCINO 0.5 is a browser extension that assists users with proposal creation and budget management. 
+#
+FRAPROCCINO  is a browser extension that assists users with proposal creation and budget management. 
 
 - **Proposal Management:**  
   Create and update proposals with fields for proposal numbers, dates, titles, and budget details. Keep all related items grouped by proposal number. 
