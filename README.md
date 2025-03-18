@@ -1,3 +1,4 @@
+![Coffee](FRAPROCCINO%201.5/images/coffee.gif)
 # FRAPROCCINO 0.5 Extension
 
 FRAPROCCINO 0.5 is a browser extension that assists users with proposal creation and budget management. 
