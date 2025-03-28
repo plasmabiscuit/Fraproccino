@@ -1,0 +1,94 @@
+{
+  "manifest_version": 3,
+  "name": "FRAPROCCINO",
+  "version": "1.0.0",
+  "description": "A tool for accounts and agencies using Banner's FRAPROP.",
+  "icons": {
+    "16": "images/frap16.png",
+    "48": "images/frap48.png",
+    "128": "images/frap128.png"
+  },
+
+  "background": {
+  "service_worker": "extension/background.js"
+  },
+
+  "permissions": [
+    "storage",
+    "contextMenus",
+    "tabs",
+    "activeTab",
+    "scripting",
+    "clipboardWrite",
+    "clipboardRead",
+    "system.display",
+    "sidePanel"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "side_panel": {
+    "default_path": "extension/sidebar.html"
+  },
+  "action": {
+    "default_popup": "extension/popup.html",
+    "default_icon": {
+      "16": "images/frap16.png",
+      "48": "images/frap48.png",
+      "128": "images/frap128.png"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": [
+	"https://config-research.tntech.streamlyne.org/*",
+        "*://*/*",
+        "https://na3.docusign.net/Signing/*",
+        "file:///C:/Users/cabates/Desktop/Review%20and%20sign%20document(s)%20_%20Docusign.html",
+        "file:///C:/Users/Admin/Desktop/Review%20and%20sign%20document(s)%20_%20Docusign.html",
+        "file:///C:/Users/Admin/Desktop/Review%20and%20sign%20document(s)%20_%20Docusign_copy.html",
+        "file:///*"
+      ],
+      "css": ["extension/contentStyles.css"],
+      "js": [
+        "extension/contentScript.js",
+        "extension/sidebar.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "data/mapping.json",
+        "data/FRAPROP.json",
+        "data/updated_streamlyne_map.json",
+        "images/expourt.gif",
+        "images/coffee.gif",
+        "images/alt-Coffee.gif",
+        "images/no_coffee.gif",
+        "images/item-1.png",
+        "images/item-2.png",
+        "images/item-3.png",
+        "images/superccino.gif",
+        "images/Accounts.png",
+        "images/Agencies.png",
+        "images/pdf.png",
+        "images/word.png",
+        "images/excel.png",
+        "images/ppt.png",
+        "images/border.png",
+        "fonts/VT323-Regular.ttf",
+        "sidebar.html",
+        "siderbar.css",
+        "libs/*",
+        "fonts/*",
+        "images/*",
+        "data/*"
+      ],
+      "matches": ["<all_urls>"]
+    }
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"  }
+}

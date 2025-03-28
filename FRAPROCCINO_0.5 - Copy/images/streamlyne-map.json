@@ -1,0 +1,168 @@
+[
+    {
+        "Placeholder": "Project Title",
+        "Element Title": "* The proposed title of the project.",
+        "Selectors": {
+            "Element ID": "#document.developmentProposalList[0].title",
+            "XPath": "//*[@id=\"document.developmentProposalList[0].title\"]"
+        },
+        "URL": "https://research.tntech.streamlyne.org/proposalDevelopmentProposal.do?methodToCall=docHandler&command=initiate&docTypeName=ProposalDevelopmentDocument"    },
+   
+    {
+        "Placeholder": "Project Start Date",
+        "Element Title": "* The date the project period will begin.",
+        "Selectors": {
+            "Element ID": "#document.developmentProposalList[0].requestedStartDateInitial",
+            "XPath": "//*[@id=\"document.developmentProposalList[0].requestedStartDateInitial\"]"
+        },
+        "URL": "https://research.tntech.streamlyne.org/proposalDevelopmentProposal.do?methodToCall=docHandler&command=initiate&docTypeName=ProposalDevelopmentDocument"    },
+
+    {
+        "Placeholder": "Project End Date",
+        "Element Title": "* The date the project period will terminate.",
+        "Selectors": {
+            "Element ID": "#document.developmentProposalList[0].requestedEndDateInitial",
+            "XPath": "//*[@id=\"document.developmentProposalList[0].requestedEndDateInitial\"]"
+        },
+        "URL": "https://research.tntech.streamlyne.org/proposalDevelopmentProposal.do?methodToCall=docHandler&command=initiate&docTypeName=ProposalDevelopmentDocument"    },
+
+    {
+        "Placeholder": "PI Department",
+        "Element Title": "* The proposal's fixed home unit that will be used for routing and business rule purposes. AKA Owned by Unit.",
+        "Selectors": {
+            "Element ID": "#document.developmentProposalList[0].ownedByUnitNumber",
+            "XPath": "//*[@id=\"document.developmentProposalList[0].ownedByUnitNumber\"]"
+        },
+        "URL": "https://research.tntech.streamlyne.org/proposalDevelopmentProposal.do?methodToCall=docHandler&command=initiate&docTypeName=ProposalDevelopmentDocument"    },
+
+        {
+            "Placeholder": "Sponsor Code",
+            "Element Title": "The identification number of the organization or agency that is providing support for the sponsored project.(s)",
+            "Selectors": {
+                "Element ID": "#document.developmentProposalList[0].sponsorCode",
+                "XPath": "//*[@id=\"document.developmentProposalList[0].sponsorCode\"]"
+            },
+            "URL": "https://research.tntech.streamlyne.org/proposalDevelopmentProposal.do?methodToCall=refresh&docFormKey=28&anchor=RequiredFieldsforSavingDocument&docNum=6030"
+        },
+
+    {
+        "Placeholder": "Sponsor Deadline",
+        "Element Title": "* The date in which the proposal is due to the sponsoring agency.  Additional deadlines may be set by the office authorized to submit proposals on behalf of the institution (e.g. sponsored programs, etc.).",
+        "Selectors": {
+            "Element ID": "#document.developmentProposalList[0].deadlineDate",
+            "XPath": "//*[@id=\"document.developmentProposalList[0].deadlineDate\"]"
+        },
+        "URL": "https://research.tntech.streamlyne.org/proposalDevelopmentProposal.do?methodToCall=docHandler&command=initiate&docTypeName=ProposalDevelopmentDocument"
+    },
+
+    {
+        "Placeholder": "Opportunity ID",
+        "Element Title": "A unique identifier associated with each sponsor's funding opportunity announcement. AKA NOFO ",
+        "Selectors": {
+            "Element ID": "#document.developmentProposalList[0].programAnnouncementNumber",
+            "XPath": "//*[@id=\"document.developmentProposalList[0].programAnnouncementNumber\"]"
+        },
+        "URL": "https://research.tntech.streamlyne.org/proposalDevelopmentProposal.do?methodToCall=docHandler&command=initiate&docTypeName=ProposalDevelopmentDocument"
+    },
+
+    {
+        "Placeholder": "Opportunity Title",
+        "Element Title": "The title of a publicly available document, announcing a federal agency's intentions to award discretionary grants or cooperative agreements, usually as a result of competition for funds.  AKA  Funding opportunity announcements, notices of funding availability, or solicitations.",
+        "Selectors": {
+            "Element ID": "#document.developmentProposalList[0].programAnnouncementTitle",
+            "XPath": "//*[@id=\"document.developmentProposalList[0].programAnnouncementTitle\"]"
+        },
+        "URL": "https://research.tntech.streamlyne.org/proposalDevelopmentProposal.do?methodToCall=docHandler&command=initiate&docTypeName=ProposalDevelopmentDocument"
+    },
+
+    {
+        "Placeholder": "CFDA",
+        "Element Title": "A unique identifier for the sponsor and the funding opportunity announcement.  AKA ",
+        "Selectors": {
+            "Element ID": "#document.developmentProposalList[0].cfdaNumber",
+            "XPath": "//*[@id=\"document.developmentProposalList[0].cfdaNumber\"]"
+        },
+        "URL": "https://research.tntech.streamlyne.org/proposalDevelopmentProposal.do?methodToCall=docHandler&command=initiate&docTypeName=ProposalDevelopmentDocument"
+    },
+
+    {
+        "Placeholder": "Activity Type",
+        "Element Title": " The type of activity proposed, e.g. organized research, instruction, etc.",
+        "Selectors": {
+            "Element ID": "#document.developmentProposalList[0].activityTypeCode",
+            "XPath": "//*[@id=\"document.developmentProposalList[0].activityTypeCode\"]"
+        },
+        "URL": "https://research.tntech.streamlyne.org/proposalDevelopmentProposal.do?methodToCall=refresh&docFormKey=28&anchor=RequiredFieldsforSavingDocument&docNum=6030"
+    },
+
+    {
+        "Placeholder": "Key Personnel Usernames",
+        "Element Title": "Email trimmed before @ (s)",
+        "Selectors": {
+            "Element ID": "#personPersonnel",
+            "XPath": "//*[@id=\"personPersonnel\"]"
+        },
+        "URL": "https://research.tntech.streamlyne.org/proposalDevelopmentKeyPersonnel.do?methodToCall=refresh&docFormKey=33&anchor=topOfForm&docNum=6030"
+    },
+
+    {
+        "Placeholder": "Key Personnel Role",
+        "Element Title": "PI, CoPI, or Key Person",
+        "Selectors": {
+            "Element ID": "#newProposalPerson.proposalPersonRoleId",
+            "XPath": "//*[@id=\"newProposalPerson.proposalPersonRoleId\"]"
+        },
+        "URL": "https://research.tntech.streamlyne.org/proposalDevelopmentKeyPersonnel.do"
+    },
+
+    {
+        "Placeholder": "Personnel Detail- Persons",
+        "Element Title": "Person",
+        "Selectors": {
+            "Element ID": "#newBudgetPersonnelDetails.personSequenceNumber",
+            "XPath": "//*[@id=\"newBudgetPersonnelDetails.personSequenceNumber\"]"
+        },
+        "URL": "https://research.tntech.streamlyne.org/budgetParameters.do"
+    },
+
+    {
+        "Placeholder": "Personnel Detail- Salary Type",
+        "Element Title": "Listed after Personnel Name in Salaries Section",
+        "Selectors": {
+            "Element ID": "N/A",
+            "XPath": "//html/body/div[2]/form/div[2]/div[1]/div[2]/div[3]/div/div[5]/div[2]/div/div/table/tbody/tr[2]/td[2]/div/select"
+        },
+        "URL": "https://research.tntech.streamlyne.org/budgetParameters.do"
+    },
+
+    {
+        "Placeholder": "Equipment- Type",
+        "Element Title": "Equipment, Equipment Rental, Other, Reactor Use",
+        "Selectors": {
+            "Element ID": "N/A",
+            "XPath": "//html/body/div/form/div[2]/div/div[2]/div[3]/div[1]/div[3]/div[2]/div/div/table/tbody/tr[2]/td[1]/div/select"
+        },
+        "URL": "https://research.tntech.streamlyne.org/budgetExpenses.do"
+    },
+
+    {
+        "Placeholder": "Equipment- Description",
+        "Element Title": "Description ",
+        "Selectors": {
+            "Element ID": "#newBudgetLineItems[0].lineItemDescription",
+            "XPath": "//*[@id=\"newBudgetLineItems[0].lineItemDescription\"]"
+        },
+        "URL": "https://research.tntech.streamlyne.org/budgetExpenses.do"
+    },
+
+    {
+        "Placeholder": "Equipment- Cost",
+        "Element Title": "Item Cost for equipment",
+        "Selectors": {
+            "Element ID": "#newBudgetLineItems[0].lineItemCost",
+            "XPath": "//*[@id=\"newBudgetLineItems[0].lineItemCost\"]"
+        },
+        "URL": "https://research.tntech.streamlyne.org/budgetExpenses.do"
+    }
+
+]
