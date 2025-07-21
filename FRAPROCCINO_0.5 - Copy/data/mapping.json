@@ -79,19 +79,19 @@
     },
     {
         "description": "Total Awarded",
-        "column": 28,
+        "column": 33,
         "query": "Optional - Text 164",
         "banner-elementId": null
     },
     {
         "description": "Total Direct",
-        "column": 29,
+        "column": 34,
         "query": "Optional - Text  146",
         "banner-elementId": null
     },
     {
         "description": "Total Indirect",
-        "column": 30,
+        "column": 35,
         "query": "Optional - Text  159",
         "banner-elementId": null
     },
